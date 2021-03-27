@@ -128,6 +128,7 @@ int main(void)
 
     // Make the window's context current
     glfwMakeContextCurrent(window);
+    glfwSwapInterval(1);
     if (glewInit() != GLEW_OK)
         std::cout << "Error!" << std::endl;
     std::cout << glGetString(GL_VERSION) << std::endl;
@@ -143,6 +144,11 @@ int main(void)
         0, 1, 2,
         2, 3, 0
     };
+
+    //Initialize vertex array object
+    unsigned int vao;
+    CallWithLog(glGenVertexArrays(1, &vao));
+    CallWithLog(glBindVertexArray(vao));
 
     //Initialize, bind and populate the vertex glBuffer.
     unsigned int buffer;
@@ -164,9 +170,15 @@ int main(void)
     unsigned int shaderProgram = CreateShaderProgram("res/shaders/Basic.shader");
     glUseProgram(shaderProgram);
 
+    //using "uniforms" in the shader program
+    CallWithLog(int uniform_id = glGetUniformLocation(shaderProgram, "u_Color"));
+    ASSERT(uniform_id != -1);
+    CallWithLog(glUniform4f(uniform_id, 0.2f, 0.3f, 0.8f, 1.0f));
+
     //Main loop the draws on screen.
     while (!glfwWindowShouldClose(window)) {
         glClear(GL_COLOR_BUFFER_BIT);
+        glBindVertexArray(vao);
         CallWithLog(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
         glfwSwapBuffers(window);  
         glfwPollEvents();
