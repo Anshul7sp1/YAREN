@@ -4,27 +4,9 @@
 #include <fstream>
 #include <sstream>
 
-//------------------------------------MACROS-----------------------------------
-
-#define ASSERT(x) if(!(x)) __debugbreak();
-#define CallWithLog(x) GLClearError();\
-    x;\
-    ASSERT(GLLogCall(#x, __FILE__, __LINE__))
-
-//---------------------------------ERROR LOGGING--------------------------------
-
-static void GLClearError() {
-    while (glGetError() != GL_NO_ERROR);
-}
-static bool GLLogCall(const char* function, const char* file, int line) {
-    GLenum error = glGetError();
-    if (error) {
-        std::cout << "[OpenGL Error](" << error << ")\n[Function]" << function<< "\n[File]" << file << "\n[Line]" << line << std::endl;
-        return false;
-    }
-    return true;
-}
-
+#include "Renderer.h"
+#include "VertexBuffer.h"
+#include "IndexBuffer.h"
 //---------------------------------SHADER PROGRAM-------------------------------
 
 //A shader source object that contains vertex and fragment shader source code.
@@ -140,7 +122,7 @@ int main(void)
          0.5f,  0.5f,
         -0.5f,  0.5f
     };
-    int indices[] = {
+    unsigned int indices[] = {
         0, 1, 2,
         2, 3, 0
     };
@@ -152,18 +134,13 @@ int main(void)
 
     //Initialize, bind and populate the vertex glBuffer.
     unsigned int buffer;
-    glGenBuffers(1, &buffer);
-    glBindBuffer(GL_ARRAY_BUFFER, buffer);
-    glBufferData(GL_ARRAY_BUFFER, 4 * 2 * sizeof(float), positions, GL_STATIC_DRAW);
+    VertexBuffer vb(positions, 4 * 2 * sizeof(float));
     //Explain the type and size of different attriibutes that are in a vertex using id.
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), 0);
     glEnableVertexAttribArray(0);
 
     //Initialize, bind and populate the index glBuffer.
-    unsigned int ibo;
-    glGenBuffers(1, &ibo);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(unsigned int), indices, GL_STATIC_DRAW);
+    IndexBuffer ib(indices, 6);
 
     //Create a shader program that will work on the GPU and make
     //use of the provided vertex and index buffers.
