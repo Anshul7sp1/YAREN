@@ -7,6 +7,7 @@
 #include "Renderer.h"
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
+#include "VertexArray.h"
 //---------------------------------SHADER PROGRAM-------------------------------
 
 //A shader source object that contains vertex and fragment shader source code.
@@ -115,54 +116,50 @@ int main(void)
         std::cout << "Error!" << std::endl;
     std::cout << glGetString(GL_VERSION) << std::endl;
     
-    //vertex and index buffers.
-    float positions[] = {
-        -0.5f, -0.5f,
-         0.5f, -0.5f,
-         0.5f,  0.5f,
-        -0.5f,  0.5f
-    };
-    unsigned int indices[] = {
-        0, 1, 2,
-        2, 3, 0
-    };
+    {
+        //vertex and index buffers.
+        float positions[] = {
+            -0.5f, -0.5f,
+             0.5f, -0.5f,
+             0.5f,  0.5f,
+            -0.5f,  0.5f
+        };
+        unsigned int indices[] = {
+            0, 1, 2,
+            2, 3, 0
+        };
 
-    //Initialize vertex array object
-    unsigned int vao;
-    CallWithLog(glGenVertexArrays(1, &vao));
-    CallWithLog(glBindVertexArray(vao));
+        VertexBuffer vb(positions, 4 * 2 * sizeof(float));
+        VertexLayout layout;
+        layout.Push(GL_FLOAT, 2);
+        VertexArray vao;
+        vao.AddBuffer(vb, layout);
 
-    //Initialize, bind and populate the vertex glBuffer.
-    unsigned int buffer;
-    VertexBuffer vb(positions, 4 * 2 * sizeof(float));
-    //Explain the type and size of different attriibutes that are in a vertex using id.
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), 0);
-    glEnableVertexAttribArray(0);
+        IndexBuffer ib(indices, 6);
 
-    //Initialize, bind and populate the index glBuffer.
-    IndexBuffer ib(indices, 6);
+        //Create a shader program that will work on the GPU and make
+        //use of the provided vertex and index buffers.
+        unsigned int shaderProgram = CreateShaderProgram("res/shaders/Basic.shader");
+        glUseProgram(shaderProgram);
 
-    //Create a shader program that will work on the GPU and make
-    //use of the provided vertex and index buffers.
-    unsigned int shaderProgram = CreateShaderProgram("res/shaders/Basic.shader");
-    glUseProgram(shaderProgram);
+        //using "uniforms" in the shader program
+        CallWithLog(int uniform_id = glGetUniformLocation(shaderProgram, "u_Color"));
+        ASSERT(uniform_id != -1);
+        CallWithLog(glUniform4f(uniform_id, 0.2f, 0.3f, 0.8f, 1.0f));
 
-    //using "uniforms" in the shader program
-    CallWithLog(int uniform_id = glGetUniformLocation(shaderProgram, "u_Color"));
-    ASSERT(uniform_id != -1);
-    CallWithLog(glUniform4f(uniform_id, 0.2f, 0.3f, 0.8f, 1.0f));
+        //Main loop the draws on screen.
+        while (!glfwWindowShouldClose(window)) {
+            glClear(GL_COLOR_BUFFER_BIT);
+            vao.Bind();
+            ib.Bind();
+            CallWithLog(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
+            glfwSwapBuffers(window);
+            glfwPollEvents();
+        }
 
-    //Main loop the draws on screen.
-    while (!glfwWindowShouldClose(window)) {
-        glClear(GL_COLOR_BUFFER_BIT);
-        glBindVertexArray(vao);
-        CallWithLog(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
-        glfwSwapBuffers(window);  
-        glfwPollEvents();
+        //Freeing resoures.
+        glDeleteProgram(shaderProgram);
     }
-
-    //Freeing resoures.
-    glDeleteProgram(shaderProgram);
     glfwTerminate();
     return 0;
 }
