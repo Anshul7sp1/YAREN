@@ -3,6 +3,7 @@
 
 VertexArray::VertexArray() {
 	CallWithLog(glGenVertexArrays(1, &m_RendererID));
+	this->Bind();
 }
 VertexArray::~VertexArray() {
 	CallWithLog(glDeleteVertexArrays(1, &m_RendererID));
