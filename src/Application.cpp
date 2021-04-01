@@ -8,107 +8,22 @@
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
 #include "VertexArray.h"
-//---------------------------------SHADER PROGRAM-------------------------------
-
-//A shader source object that contains vertex and fragment shader source code.
-struct ShaderProgramSource {
-    std::string VertexShader;
-    std::string FragmentShader;
-};
-
-//Parses shader code from a .shader file into a shader source object. 
-static ShaderProgramSource ParseShader(const std::string& filepath) {
-    std::ifstream fin(filepath);
-    if (!fin)
-        std::cout << "Error: Could not open .shader file. Using default shader instead\n";
-    enum class ShaderType {
-        NONE = -1,
-        VERTEX = 0,
-        FRAGMENT = 1
-    };
-
-    std::string line;
-    std::stringstream ss[2];
-    ShaderType cur_type = ShaderType::NONE;
-
-    size_t notFound = std::string::npos;
-    while (getline(fin, line)) {
-        if (line.find("#shader") != notFound) {
-            if (line.find("vertex") != notFound)
-                cur_type = ShaderType::VERTEX;
-            else if (line.find("fragment") != notFound)
-                cur_type = ShaderType::FRAGMENT;
-        }
-        else {
-            ss[(int)cur_type] << line << "\n";
-        }
-    }
-    return { ss[0].str(), ss[1].str() };
-}
-
-//Compiles a shader source into a glShader (with error feedback).
-static unsigned int CompileShader(unsigned int type, const std::string& source) {
-    unsigned int id = glCreateShader(type);
-    const char* src = source.c_str();
-    CallWithLog(glShaderSource(id, 1, &src, nullptr));
-    CallWithLog(glCompileShader(id));
-
-    int result;
-    CallWithLog(glGetShaderiv(id, GL_COMPILE_STATUS, &result));
-    if (result == GL_FALSE) {
-        int length;
-        CallWithLog(glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length));
-        char* message = (char*)_malloca(length * sizeof(char));
-        CallWithLog(glGetShaderInfoLog(id, length, &length, message));
-        std::cout << "Failed to compile " << type << " shader\n" << "Info: "<< message <<std::endl;
-        CallWithLog(glDeleteShader(id));
-        return 0;
-    }
-
-    return id;
-}
-
-//Takes vertex and fragment shader source, compiles them using CompileShader 
-//and links them into a program.
-static unsigned int CreateShaderProgram(const std::string& vertexShader, const std::string& fragmentShader) {
-    unsigned int program = glCreateProgram();
-    unsigned int vs = CompileShader(GL_VERTEX_SHADER, vertexShader);
-    unsigned int fs = CompileShader(GL_FRAGMENT_SHADER, fragmentShader);
-
-    CallWithLog(glAttachShader(program, vs));
-    CallWithLog(glAttachShader(program, fs));
-    CallWithLog(glLinkProgram(program));
-    CallWithLog(glValidateProgram(program));
-
-    CallWithLog(glDeleteShader(vs));
-    CallWithLog(glDeleteShader(fs));
-
-    return program;
-}
-
-//Overload for CreateShaderProgram. Takes a shader source file, parses it and calls previous overload.
-static unsigned int CreateShaderProgram(const std::string& file) {
-    ShaderProgramSource src = ParseShader(file);
-    return CreateShaderProgram(src.VertexShader, src.FragmentShader);
-}
+#include "Shader.h"
 
 
 //--------------------------------------MAIN------------------------------------
 int main(void)
 {
     GLFWwindow* window;
-
     //Initialize the library
     if (!glfwInit())
         return -1;
-
     // Create a windowed mode window and its OpenGL context
     window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
     if (!window) {
         glfwTerminate();
         return -1;
     }
-
     // Make the window's context current
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1);
@@ -128,24 +43,23 @@ int main(void)
             0, 1, 2,
             2, 3, 0
         };
-
+        //Vertex array object creation
         VertexBuffer vb(positions, 4 * 2 * sizeof(float));
         VertexLayout layout;
         layout.Push(GL_FLOAT, 2);
         VertexArray vao;
         vao.AddBuffer(vb, layout);
-
+        //Creating IndexBuffer
         IndexBuffer ib(indices, 6);
 
         //Create a shader program that will work on the GPU and make
         //use of the provided vertex and index buffers.
-        unsigned int shaderProgram = CreateShaderProgram("res/shaders/Basic.shader");
-        glUseProgram(shaderProgram);
+        Shader myShader("res/shaders/Basic.shader");
+        myShader.CreateShaderProgram();
+        myShader.Bind();
 
         //using "uniforms" in the shader program
-        CallWithLog(int uniform_id = glGetUniformLocation(shaderProgram, "u_Color"));
-        ASSERT(uniform_id != -1);
-        CallWithLog(glUniform4f(uniform_id, 0.2f, 0.3f, 0.8f, 1.0f));
+        myShader.SetUniform4f("u_Color", 0.2f, 0.3f, 0.8f, 1.0f);
 
         //Main loop the draws on screen.
         while (!glfwWindowShouldClose(window)) {
@@ -157,8 +71,6 @@ int main(void)
             glfwPollEvents();
         }
 
-        //Freeing resoures.
-        glDeleteProgram(shaderProgram);
     }
     glfwTerminate();
     return 0;
