@@ -2,6 +2,7 @@
 
 #include <string>
 #include <GL/glew.h>
+#include <unordered_map>
 
 struct ShaderProgramSource {
 	std::string VertexShader;
@@ -12,6 +13,7 @@ class Shader {
 private:
 	std::string m_FilePath;
 	unsigned int m_RendererID;
+	std::unordered_map<std::string, int> m_UniformLocationMap;
 public:
 	Shader(const std::string& filepath);
 	~Shader();

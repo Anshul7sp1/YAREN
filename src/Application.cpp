@@ -58,15 +58,23 @@ int main(void)
         myShader.CreateShaderProgram();
         myShader.Bind();
 
-        //using "uniforms" in the shader program
-        myShader.SetUniform4f("u_Color", 0.2f, 0.3f, 0.8f, 1.0f);
+        float r = 0.0f, increment = 0.05f;
 
         //Main loop the draws on screen.
         while (!glfwWindowShouldClose(window)) {
             glClear(GL_COLOR_BUFFER_BIT);
+            
+            myShader.SetUniform4f("u_Color", r, 1-r, 0.8f, 1.0f);
             vao.Bind();
             ib.Bind();
             CallWithLog(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
+            
+            if (r > 1.0f)
+                increment = -0.05;
+            else if (r < 0.0f)
+                increment = 0.05f;
+            r += increment;
+            
             glfwSwapBuffers(window);
             glfwPollEvents();
         }

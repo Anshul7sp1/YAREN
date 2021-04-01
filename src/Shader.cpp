@@ -4,7 +4,6 @@
 #include <fstream>
 #include <sstream>
 
-//Constructor
 Shader::Shader(const std::string& filepath)
 	:m_FilePath(filepath), m_RendererID(0) {}
 
@@ -23,6 +22,16 @@ void Shader::Unbind() const {
 
 void Shader::SetUniform4f(const std::string& name, float v0, float v1, float v2, float v3){
     CallWithLog(glUniform4f(GetUniformLocation(name), v0, v1, v2, v3));
+}
+
+int Shader::GetUniformLocation(const std::string& name) {
+    if (m_UniformLocationMap.find(name) != m_UniformLocationMap.end())
+        return m_UniformLocationMap[name];
+    CallWithLog(int uniform_id = glGetUniformLocation(m_RendererID, name.c_str()));
+    if (uniform_id == -1)
+        std::cout << "[Warning]: Uniform \"" << name << "\" not found in shader \"" << m_FilePath << "\"\n";
+    m_UniformLocationMap[name] = uniform_id;
+    return uniform_id;
 }
 
 //Parses shader code from a .shader file into a shader source object. 
@@ -55,12 +64,6 @@ ShaderProgramSource Shader::ParseShader() {
     return { ss[0].str(), ss[1].str() };
 }
 
-int Shader::GetUniformLocation(const std::string& name) {
-    CallWithLog(int uniform_id = glGetUniformLocation(m_RendererID, name.c_str()));
-    if(uniform_id == -1) 
-        std::cout << "[Warning]: Uniform \"" << name << "\" not found in shader \"" << m_FilePath << "\"\n";
-    return uniform_id;
-}
 
 //Compiles a shader source into a glShader (with error feedback).
 unsigned int Shader::CompileShader(unsigned int type, const std::string& source) {
