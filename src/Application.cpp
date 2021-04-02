@@ -56,19 +56,18 @@ int main(void)
         //use of the provided vertex and index buffers.
         Shader myShader("res/shaders/Basic.shader");
         myShader.CreateShaderProgram();
-        myShader.Bind();
 
+        Renderer renderer;
         float r = 0.0f, increment = 0.05f;
 
         //Main loop the draws on screen.
         while (!glfwWindowShouldClose(window)) {
-            glClear(GL_COLOR_BUFFER_BIT);
             
-            myShader.SetUniform4f("u_Color", r, 1-r, 0.8f, 1.0f);
-            vao.Bind();
-            ib.Bind();
-            CallWithLog(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
-            
+            renderer.Clear();
+            myShader.Bind();
+            myShader.SetUniform4f("u_Color", r, 0.3f, 0.8f, 1.0f);
+            renderer.Draw(vao, ib, myShader);
+
             if (r > 1.0f)
                 increment = -0.05;
             else if (r < 0.0f)
