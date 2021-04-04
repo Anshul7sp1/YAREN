@@ -11,6 +11,9 @@
 #include "Shader.h"
 #include "Texture.h"
 
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+
 
 //--------------------------------------MAIN------------------------------------
 int main(void)
@@ -45,6 +48,7 @@ int main(void)
             2, 3, 0
         };
 
+        //For transparent images
         CallWithLog(glEnable(GL_BLEND));
         CallWithLog(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 
@@ -64,6 +68,7 @@ int main(void)
         //use of the provided vertex and index buffers.
         Shader myShader("res/shaders/Basic.shader");
         myShader.CreateShaderProgram();
+        glm::mat4 proj = glm::ortho(-2.0f, 2.0f, -1.5f, 1.5f, -1.0f, 1.0f);
 
         //Textures
         Texture texture("res/textures/AMLogo.png");
@@ -78,6 +83,8 @@ int main(void)
             myShader.Bind();
             myShader.SetUniform4f("u_Color", r, 0.3f, 0.8f, 1.0f);
             myShader.SetUniform1i("u_Texture", 0);
+            myShader.SetUniformMat4f("u_MVP", proj);
+
 
             renderer.Draw(vao, ib, myShader);
 
