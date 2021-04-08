@@ -36,6 +36,7 @@ void Shader::SetUniformMat4f(const std::string& name, const glm::mat4& matrix) {
     CallWithLog(glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, &matrix[0][0]));
 }
 
+//Finds and returns id of a uniform in Shader source along with warnings in case not found.
 int Shader::GetUniformLocation(const std::string& name) {
     if (m_UniformLocationMap.find(name) != m_UniformLocationMap.end())
         return m_UniformLocationMap[name];

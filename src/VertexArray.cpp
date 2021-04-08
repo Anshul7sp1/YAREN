@@ -17,6 +17,8 @@ void VertexArray::Unbind() const {
 	CallWithLog(glBindVertexArray(0));
 }
 
+
+//Takes and binds the Vertex and layout buffers into a VertexArrayObject for easier use.
 void VertexArray::AddBuffer(const VertexBuffer& vb, const VertexLayout& layout) {
 	vb.Bind();
 	const std::vector<VertexAttribute>& attributes = layout.GetAttributes();

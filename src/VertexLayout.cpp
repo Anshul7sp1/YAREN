@@ -1,5 +1,6 @@
 #include "VertexLayout.h"
 
+//Adds an attribute i.e. a type and number of those required, to the vertex.
 void VertexLayout::Push(unsigned int gltype, unsigned int count){
 	switch (gltype) {
 	case GL_FLOAT: 
