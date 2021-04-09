@@ -38,10 +38,10 @@ int main(void)
     {
         //vertex and index buffers.
         float positions[] = {
-            -0.5f, -0.5f, 0.0f, 0.0f,
-             0.5f, -0.5f, 1.0f, 0.0f,
-             0.5f,  0.5f, 1.0f, 1.0f,
-            -0.5f,  0.5f, 0.0f, 1.0f
+             0.0f,  0.0f, 0.0f, 0.0f,
+             300.0f,  0.0f, 1.0f, 0.0f,
+             300.0f,  150.0f, 1.0f, 1.0f,
+             0.0f,  150.0f, 0.0f, 1.0f
         };
         unsigned int indices[] = {
             0, 1, 2,
@@ -64,11 +64,17 @@ int main(void)
         //Creating IndexBuffer
         IndexBuffer ib(indices, 6);
 
+
         //Create a shader program that will work on the GPU and make
         //use of the provided vertex and index buffers.
         Shader myShader("res/shaders/Basic.shader");
         myShader.CreateShaderProgram();
-        glm::mat4 proj = glm::ortho(-2.0f, 2.0f, -1.5f, 1.5f, -1.0f, 1.0f);
+        glm::mat4 proj = glm::ortho(0.0f, 960.0f, 0.0f, 540.0f, -1.0f, 1.0f);
+        glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(-100, 0, 0));
+        glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(200, 200, 0));
+
+        glm::mat4 mvp = proj * view * model;
+        
 
         //Textures
         Texture texture("res/textures/AMLogo.png");
@@ -83,7 +89,7 @@ int main(void)
             myShader.Bind();
             myShader.SetUniform4f("u_Color", r, 0.3f, 0.8f, 1.0f);
             myShader.SetUniform1i("u_Texture", 0);
-            myShader.SetUniformMat4f("u_MVP", proj);
+            myShader.SetUniformMat4f("u_MVP", mvp);
 
 
             renderer.Draw(vao, ib, myShader);
