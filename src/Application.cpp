@@ -42,8 +42,8 @@ int main(void)
         //vertex and index buffers.
         float positions[] = {
              0.0f,  0.0f, 0.0f, 0.0f,
-             300.0f,  0.0f, 1.0f, 0.0f,
-             300.0f,  150.0f, 1.0f, 1.0f,
+             960.0f,  0.0f, 1.0f, 0.0f,
+             960.0f,  150.0f, 1.0f, 1.0f,
              0.0f,  150.0f, 0.0f, 1.0f
         };
         unsigned int indices[] = {
@@ -74,9 +74,7 @@ int main(void)
         myShader.CreateShaderProgram();
         glm::mat4 proj = glm::ortho(0.0f, 960.0f, 0.0f, 540.0f, -1.0f, 1.0f);
         glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(-100, 0, 0));
-        glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(200, 200, 0));
-
-        glm::mat4 mvp = proj * view * model;
+        
         
 
         //Textures
@@ -95,6 +93,7 @@ int main(void)
 
         //Variables
         float r = 0.0f, increment = 0.05f;
+        glm::vec3 translation(200, 200, 0);
         bool show_demo_window = true;
         bool show_another_window = false;
         ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
@@ -106,6 +105,8 @@ int main(void)
             renderer.Clear();
 
             ImGui_ImplGlfwGL3_NewFrame();
+            glm::mat4 model = glm::translate(glm::mat4(1.0f), translation);
+            glm::mat4 mvp = proj * view * model; 
 
             myShader.Bind();
             myShader.SetUniform4f("u_Color", r, 0.3f, 0.8f, 1.0f);
@@ -123,20 +124,7 @@ int main(void)
 
             //imgui frame
             {
-                static float f = 0.0f;
-                static int counter = 0;
-                ImGui::Text("Hello, world!");                           // Display some text (you can use a format string too)
-                ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f    
-                ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
-
-                ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our windows open/close state
-                ImGui::Checkbox("Another Window", &show_another_window);
-
-                if (ImGui::Button("Button"))                            // Buttons return true when clicked (NB: most widgets return true when edited/activated)
-                    counter++;
-                ImGui::SameLine();
-                ImGui::Text("counter = %d", counter);
-
+                ImGui::SliderFloat3("Translation", &translation.x, 0.0f, 960.0f);
                 ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
             }
 
