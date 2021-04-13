@@ -41,10 +41,10 @@ int main(void)
     {
         //vertex and index buffers.
         float positions[] = {
-             0.0f,  0.0f, 0.0f, 0.0f,
-             960.0f,  0.0f, 1.0f, 0.0f,
-             960.0f,  150.0f, 1.0f, 1.0f,
-             0.0f,  150.0f, 0.0f, 1.0f
+             -50.0f, -50.0f, 0.0f, 0.0f,
+              50.0f, -50.0f, 1.0f, 0.0f,
+              50.0f,  50.0f, 1.0f, 1.0f,
+             -50.0f,  50.0f, 0.0f, 1.0f
         };
         unsigned int indices[] = {
             0, 1, 2,
@@ -73,7 +73,7 @@ int main(void)
         Shader myShader("res/shaders/Basic.shader");
         myShader.CreateShaderProgram();
         glm::mat4 proj = glm::ortho(0.0f, 960.0f, 0.0f, 540.0f, -1.0f, 1.0f);
-        glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(-100, 0, 0));
+        glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
         
         
 
@@ -93,7 +93,8 @@ int main(void)
 
         //Variables
         float r = 0.0f, increment = 0.05f;
-        glm::vec3 translation(200, 200, 0);
+        glm::vec3 translationA(200, 200, 0);
+        glm::vec3 translationB(400, 200, 0);
         bool show_demo_window = true;
         bool show_another_window = false;
         ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
@@ -105,12 +106,18 @@ int main(void)
             renderer.Clear();
 
             ImGui_ImplGlfwGL3_NewFrame();
-            glm::mat4 model = glm::translate(glm::mat4(1.0f), translation);
-            glm::mat4 mvp = proj * view * model; 
 
             myShader.Bind();
             myShader.SetUniform4f("u_Color", r, 0.3f, 0.8f, 1.0f);
             myShader.SetUniform1i("u_Texture", 0);
+            glm::mat4 model = glm::translate(glm::mat4(1.0f), translationA);
+            glm::mat4 mvp = proj * view * model; 
+            myShader.SetUniformMat4f("u_MVP", mvp);
+
+            renderer.Draw(vao, ib, myShader);
+
+            model = glm::translate(glm::mat4(1.0f), translationB);
+            mvp = proj * view * model;
             myShader.SetUniformMat4f("u_MVP", mvp);
 
             renderer.Draw(vao, ib, myShader);
@@ -124,7 +131,8 @@ int main(void)
 
             //imgui frame
             {
-                ImGui::SliderFloat3("Translation", &translation.x, 0.0f, 960.0f);
+                ImGui::SliderFloat3("Translation A", &translationA.x, 0.0f, 960.0f);
+                ImGui::SliderFloat3("Translation B", &translationB.x, 0.0f, 960.0f);
                 ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
             }
 
