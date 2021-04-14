@@ -49,7 +49,7 @@ int main(void)
 
         //--------------------------IMGUI----------------------------------
         ImGui::CreateContext();
-            ImGuiIO& io = ImGui::GetIO(); (void)io;
+        ImGuiIO& io = ImGui::GetIO(); (void)io;
         ImGui_ImplGlfwGL3_Init(window, true);
         ImGui::StyleColorsDark();
 
