@@ -17,8 +17,8 @@
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_glfw_gl3.h"
 
+#include "tests/Test.h"
 #include "tests/TestClearColor.h"
-
 
 //--------------------------------------MAIN------------------------------------
 int main(void)
@@ -53,7 +53,10 @@ int main(void)
         ImGui_ImplGlfwGL3_Init(window, true);
         ImGui::StyleColorsDark();
 
-        test::TestClearColor test;
+        test::Test* currentTest;
+        test::TestMenu* testMenu = new test::TestMenu(currentTest);
+        currentTest = testMenu;
+        testMenu->RegisterTest<test::TestClearColor>("Clear Color");
 
         //---------------------------Rendering Loop---------------------------
         //Main loop the draws on screen.
@@ -61,12 +64,20 @@ int main(void)
             
             renderer.Clear();
 
-            test.OnUpdate(0.0f);
-            test.OnRender();
-
             ImGui_ImplGlfwGL3_NewFrame();
 
-            test.OnImGuiRender();
+            if (currentTest) {
+                currentTest->OnUpdate(0.0f);
+                currentTest->OnRender();
+                ImGui::Begin("Test Menu");
+                if (currentTest != testMenu && ImGui::Button("<-")) {
+                    delete currentTest;
+                    currentTest = testMenu;
+                }
+                currentTest->OnImGuiRender();
+                ImGui::End();
+            }
+
             ImGui::Render();
             ImGui_ImplGlfwGL3_RenderDrawData(ImGui::GetDrawData());
 
