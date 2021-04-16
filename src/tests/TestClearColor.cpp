@@ -11,11 +11,13 @@ namespace test {
 		CallWithLog(glClear(GL_COLOR_BUFFER_BIT));
 	}
 
+	//To be called in the rendering loop in main.
 	void TestClearColor::OnRender() {
 		CallWithLog(glClearColor(m_ClearColor[0], m_ClearColor[1], m_ClearColor[2], m_ClearColor[3]));
 		CallWithLog(glClear(GL_COLOR_BUFFER_BIT));
 	}
 
+	//To be called before calling the ImGui render in main loop.
 	void TestClearColor::OnImGuiRender() {
 		ImGui::ColorEdit4("Clear Color", m_ClearColor);
 	}

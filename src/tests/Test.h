@@ -28,7 +28,10 @@ namespace test {
 			m_Tests.push_back(std::make_pair(name, []() {return new T; }));
 		}
 	private:
+		//pointer to the test currently running
 		Test*& m_CurrentTest;
+
+		//List of all possible tests with their names and ctors
 		std::vector<std::pair<std::string, std::function<Test* ()>>> m_Tests;
 
 	};
