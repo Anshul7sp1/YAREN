@@ -3,7 +3,6 @@
 
 VertexArray::VertexArray() {
 	CallWithLog(glGenVertexArrays(1, &m_RendererID));
-	this->Bind();
 }
 VertexArray::~VertexArray() {
 	CallWithLog(glDeleteVertexArrays(1, &m_RendererID));
@@ -20,6 +19,7 @@ void VertexArray::Unbind() const {
 
 //Takes and binds the Vertex and layout buffers into a VertexArrayObject for easier use.
 void VertexArray::AddBuffer(const VertexBuffer& vb, const VertexLayout& layout) {
+	this->Bind();
 	vb.Bind();
 	const std::vector<VertexAttribute>& attributes = layout.GetAttributes();
 	unsigned int i = 0, offset = 0;

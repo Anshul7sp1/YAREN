@@ -17,8 +17,10 @@ private:
 	std::unordered_map<std::string, int> m_UniformLocationMap;
 public:
 	Shader(const std::string& filepath);
+	Shader() {}
 	~Shader();
 
+	void setShaderPath(const std::string& file);
 	void Bind() const;
 	void Unbind() const;
 	void CreateShaderProgram();

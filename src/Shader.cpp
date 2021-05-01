@@ -11,6 +11,10 @@ Shader::~Shader() {
     CallWithLog(glDeleteProgram(m_RendererID));
 }
 
+void Shader::setShaderPath(const std::string& file) {
+    m_FilePath = file;
+}
+
 void Shader::Bind() const {
     if (!m_RendererID) std::cout << "[Warning]: Using default shader.\n";
     CallWithLog(glUseProgram(m_RendererID));

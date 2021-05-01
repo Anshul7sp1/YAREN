@@ -19,6 +19,8 @@
 
 #include "tests/Test.h"
 #include "tests/TestClearColor.h"
+#include "tests/TestTexture2D.h"
+
 
 //--------------------------------------MAIN------------------------------------
 int main(void)
@@ -57,6 +59,7 @@ int main(void)
         test::TestMenu* testMenu = new test::TestMenu(currentTest);
         currentTest = testMenu;
         testMenu->RegisterTest<test::TestClearColor>("Clear Color");
+        testMenu->RegisterTest<test::TestTexture2D>("Texture2D");
 
         //---------------------------Rendering Loop---------------------------
         //Main loop the draws on screen.
