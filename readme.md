@@ -1,10 +1,64 @@
+# YAREN — Yet Another Rendering Engine
 
-# YAREN 
+A minimal OpenGL rendering engine built from scratch in C++ to understand how GPUs draw things on screen.
 
-YAREN stands for "Yet another rendering engine" (Couldn't think of a better name 🤷‍♂️)
-* Started as a playground project, it currently acts as an API for rendering, basic shaders, textures and displaying images.
-* Current entry point ([application.cpp](https://github.com/Anshul7sp1/YAREN/blob/master/src/Application.cpp)) of the application is set to a menu of different tests that can be used to check the engine.
-* Uses IMGui as a gui to select and control different options.
+No game engine. No high-level abstraction. Just raw OpenGL, shaders, and buffer management.
+
+## What it does
+
+- Renders solid-colored shapes and textured quads with translation/transformation support
+- Compiles and binds GLSL shaders at runtime
+- Manages GPU memory through vertex buffers, index buffers, and vertex array objects
+- Loads textures from disk (PNG, JPG) via `stb_image` and binds them to shader samplers
+- Provides a real-time ImGui overlay to tweak rendering parameters without recompiling
+
+## Architecture
+
+```
+src/
+├── Application.cpp       # Entry point — menu-driven test harness
+├── Renderer.h/cpp        # Draw call orchestration, clear, error handling
+├── Shader.h/cpp          # Shader loading, compilation, uniform management
+├── Texture.h/cpp         # Image loading (stb_image), texture binding
+├── VertexBuffer.h/cpp    # GPU vertex buffer allocation and data upload
+├── IndexBuffer.h/cpp     # GPU index buffer for indexed drawing
+├── VertexArray.h/cpp     # VAO — binds vertex buffers to attribute layouts
+├── VertexLayout.h/cpp    # Defines per-vertex data structure (position, UV, etc.)
+├── tests/
+│   ├── Test.h            # Base test interface
+│   └── TestClearColor.*  # Screen clear color picker (ImGui-driven)
+├── vendor/
+│   ├── glm/              # Vector/matrix math (glm)
+│   ├── imgui/            # Debug UI overlay (Dear ImGui)
+│   └── stb_image/        # Single-header image loader
+res/
+├── shaders/
+│   └── Basic.shader      # Vertex + fragment shader (GLSL)
+└── textures/             # Texture assets
+```
+
+## Design decisions
+
+**Why no engine abstraction?** The goal was to understand what happens between a draw call and pixels on screen — not to build a usable engine. Every class maps directly to an OpenGL concept.
+
+**Why ImGui?** Lets you change uniforms, clear colors, and transformation parameters at runtime without touching code. Makes the feedback loop instant.
+
+**Why separate VertexLayout from VertexBuffer?** Decoupling the data (what bytes are in the buffer) from the interpretation (which bytes are position vs. UV vs. color) makes it easy to reuse buffers with different shaders.
+
+## Build
+
+Requires Visual Studio (Windows). Open `YAREN.sln` and build.
+
+Dependencies (`src/vendor/`) are committed — no package manager needed.
+
+## Tech
+
+- **C++** (97.4%) / **GLSL** (2.6%)
+- OpenGL for rendering
+- Dear ImGui for debug UI
+- glm for math
+- stb_image for texture loading
+
 
 # Solid colors
 
